@@ -96,7 +96,7 @@ gulp.task('server', function () {
 });
 
 // Starts a server using the production build
-gulp.task('server-dist', function () {
+gulp.task('server-dist', ['build'], function () {
   connect.server({
     root: './dist',
     hostname: '0.0.0.0',
