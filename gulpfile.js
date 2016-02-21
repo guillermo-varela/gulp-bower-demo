@@ -32,8 +32,8 @@ gulp.task('inject', function () {
 });
 
 // Inject libraries via Bower in between of blocks "bower:xx" in index.html
-gulp.task('wiredep', function () {
-  gulp.src('index.html', {cwd: './app'})
+gulp.task('wiredep', ['inject'], function () {
+  return gulp.src('index.html', {cwd: './app'})
     .pipe(wiredep({
       directory: './app/lib/'
     }))
@@ -41,7 +41,7 @@ gulp.task('wiredep', function () {
 });
 
 // Compress into a single file the ones in between of blocks "build:xx" in index.html
-gulp.task('compress', ['inject', 'wiredep'], function () {
+gulp.task('compress', ['wiredep'], function () {
   return gulp.src('index.html', {cwd: './app'})
     .pipe(useref())
     .pipe(gulpIf('**/*.js', uglify({
@@ -109,4 +109,4 @@ gulp.task('build', function (done) {
   runSequence('jshint', 'jscs', 'clean:dist', 'compress', 'copy:assets', done);
 });
 
-gulp.task('default', ['server', 'watch']);
+gulp.task('default', ['inject', 'wiredep', 'server', 'watch']);
