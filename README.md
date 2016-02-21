@@ -3,6 +3,7 @@ Demonstration on how to use Bower and Gulp in a web project.
 
 - Just run from the root folder:
  - npm install
+ - bower install
  - gulp
 - Then open "http://localhost:8080" in your web browser.
 
