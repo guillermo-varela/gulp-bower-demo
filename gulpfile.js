@@ -11,7 +11,6 @@ var cssnano     = require('gulp-cssnano');
 var jshint      = require('gulp-jshint');
 var jscs        = require('gulp-jscs');
 var del         = require('del');
-var watch       = require('gulp-watch');
 var connect     = require('gulp-connect');
 var runSequence = require('run-sequence');
 
@@ -19,13 +18,11 @@ var runSequence = require('run-sequence');
 gulp.task('inject', function () {
   return gulp.src('index.html', {cwd: './app'})
     .pipe(inject(
-      gulp.src(['**/*.js', '!./lib/**/*'], {cwd: './app'}), {
-        read: false,
+      gulp.src(['**/*.js', '!./lib/**/*'], {cwd: './app', read: false}), {
         relative: true
       }))
     .pipe(inject(
-      gulp.src(['**/*.css', '!./lib/**/*'], {cwd: './app'}), {
-        read: false,
+      gulp.src(['**/*.css', '!./lib/**/*'], {cwd: './app', read: false}), {
         relative: true
       }))
     .pipe(gulp.dest('./app'));
@@ -61,14 +58,16 @@ gulp.task('copy:assets', function () {
 gulp.task('jshint', function() {
   return gulp.src(['**/*.js', '!./lib/**/*'], {cwd: './app'})
     .pipe(jshint())
-    .pipe(jshint.reporter('jshint-stylish'));
+    .pipe(jshint.reporter('jshint-stylish'))
+    .pipe(jshint.reporter('fail'));
 });
 
 // Looks for code style errors in JS and prints them
 gulp.task('jscs', function () {
   return gulp.src(['**/*.js', '!./lib/**/*'], {cwd: './app'})
     .pipe(jscs())
-    .pipe(jscs.reporter());
+    .pipe(jscs.reporter())
+    .pipe(jscs.reporter('fail'));
 });
 
 // Cleans the dist folder
@@ -81,8 +80,10 @@ gulp.task('watch', function() {
   gulp.watch(['**/*.css', '!./lib/**/*'], {cwd: './app'}, ['inject']);
   gulp.watch(['**/*.js', '!./lib/**/*'], {cwd: './app'}, ['jshint', 'jscs', 'inject']);
   gulp.watch(['./bower.json'], ['wiredep']);
-  watch('**/*.html', {cwd: './app'})
-    .pipe(connect.reload());
+  gulp.watch('**/*.html', {cwd: './app'}, function (event) {
+    gulp.src(event.path)
+      .pipe(connect.reload());
+  });
 });
 
 // Starts a development web server
